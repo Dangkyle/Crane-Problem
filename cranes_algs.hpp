@@ -41,22 +41,15 @@ path crane_unloading_exhaustive(const grid& setting) {
   // comment.
   path best(setting);
   for(size_t len = 0; len <= max_steps; len++){
-            // for bits from 0 to 2^len - 1 inclusive
             for(size_t bits = 0; bits <= pow(2,len)-1; bits++){
-                // candidate = [start]
                 path candidate(setting);
-                // for k from 0 to len-1 inclusive
                 for(size_t k = 0; k < len; ++k){
                     int bit;
                     bit = (bits >> k) & 1;
-                    // if bit is 1, then we will move →
                     if(bit == 1){
-                        // make sure the candidate stays inside the grid and never crosses an X cell
                         if(candidate.is_step_valid(STEP_DIRECTION_EAST)){
-                            // adding a right move to candidate
                             candidate.add_step(STEP_DIRECTION_EAST);
                         }
-                     // else bit is 0, then we will move ↓
                     }else {
                         // make sure the candidate stays inside the grid and never crosses an X cell
                         if(candidate.is_step_valid(STEP_DIRECTION_SOUTH)){
@@ -80,64 +73,95 @@ path crane_unloading_exhaustive(const grid& setting) {
 // The grid must be non-empty.
 //path crane_unloading_dyn_prog(const grid& setting) {
 path crane_unloading_dyn_prog(const grid& setting) {
+
   // grid must be non-empty.
   assert(setting.rows() > 0);
   assert(setting.columns() > 0);
 
-  path best(setting);
-
   using cell_type = std::optional<path>;
+
   std::vector<std::vector<cell_type>> A(setting.rows(),
-                                         std::vector<cell_type>(setting.columns()));
+                                        std::vector<cell_type>(setting.columns()));
 
   A[0][0] = path(setting);
   assert(A[0][0].has_value());
 
-  for (coordinate i = 0; i < setting.rows(); ++i) {
-    for (coordinate j = 0; j < setting.columns(); ++j) {
+  //rubric.criterion("dynamic programming - random instances", 1, [&]() std::cout << std::endl;
+  // auto small_output = crane_unloading_dyn_prog(small_random);
+  //       TEST_EQUAL("small", 4, small_output.total_cranes());
 
-      if (setting.get(i, j) == CELL_BUILDING) {
-        A[i][j].reset();
+
+  for (coordinate r = 0; r < setting.rows(); ++r) {
+    for (coordinate c = 0; c < setting.columns(); ++c) {
+
+      if (setting.get(r, c) == CELL_BUILDING) {
+        A[r][c].reset();
         continue;
       }
 
-      cell_type from_above = std::nullopt;
-      cell_type from_left = std::nullopt;
+      //begin if (setting.get(r, c) != CELL_BUILDING case
+      //if (setting.get(r, c) != CELL_BUILDING) {
 
-      if (i > 0 && A[i - 1][j].has_value()) {
-        // from_above = A[i-1][j] + [↓]
-        from_above = A[i - 1][j];
-        if (from_above->is_step_valid(STEP_DIRECTION_SOUTH)) {
-          from_above->add_step(STEP_DIRECTION_SOUTH);
+        // from_above = from_left = None
+        std::optional<path> from_above;
+        std::optional<path> from_left;
+
+        // if r greater than 0 and ! None
+        if (r > 0 && A[r-1][c].has_value()) {
+
+           from_above = A[r-1][c].value();
+
+           if(from_above->is_step_valid(STEP_DIRECTION_SOUTH) ) {
+              from_above->add_step(STEP_DIRECTION_SOUTH);
+           }
         }
-      }
-      if (j > 0 && A[i][j - 1].has_value()) {
-        // from_left = A[i][j-1] + [→]
-        from_left = A[i][j - 1];
-        if (from_left->is_step_valid(STEP_DIRECTION_EAST)) {
-          from_left->add_step(STEP_DIRECTION_EAST);
+        // if c greater than 0 and ! None
+        if (c > 0 && A[r][c-1].has_value()) {
+
+           from_left = A[r][c-1].value();
+
+           if(from_left->is_step_valid(STEP_DIRECTION_EAST) ) {
+              from_left->add_step(STEP_DIRECTION_EAST);
+           }
+
         }
-      }
-      if (from_above.has_value() && from_left.has_value()) {
-        if (from_above->total_cranes() > from_left->total_cranes()) {
-          A[i][j] = from_above;
-        } else {
-          A[i][j] = from_left;
+        // if from_above and from_left ! None
+        if(from_above.has_value() && from_left.has_value()) {
+          //if above > left
+          if(from_above->total_cranes() > from_left->total_cranes()) {
+            A[r][c] = from_above;
+          }
+          else
+          {
+            A[r][c] = from_left;
+          }
         }
-      } else if (from_above.has_value()) {
-        A[i][j] = from_above;
-      } else if (from_left.has_value()) {
-        A[i][j] = from_left;
+        // if from_above is non-None
+        else if(from_above.has_value()) {
+            A[r][c] = from_above;
+        }
+        // if from_left is non-None
+        else if (from_left.has_value()){
+           A[r][c] = from_left;
+        }
+      //end if (setting.get(r, c) != CELL_BUILDING case
+    }
+  }
+
+
+  cell_type* best = &(A[0][0]);
+  assert(best->has_value());
+  for (coordinate r = 0; r < setting.rows(); ++r) {
+    for (coordinate c = 0; c < setting.columns(); ++c) {
+      if (A[r][c].has_value() && A[r][c]->total_cranes() > (*best)->total_cranes()) {
+        best = &(A[r][c]);
       }
     }
   }
 
-  // post-processing to find maximum-cranes path
-  if (A.back().back().has_value()) {
-    best = *(A.back().back());
-  }
+  assert(best->has_value());
+ //   std::cout << "total cranes" << (**best).total_cranes() << std::endl;
 
-  return best;
+  return **best;
 }
-
 }
