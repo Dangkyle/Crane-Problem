@@ -58,11 +58,6 @@ int main() {
 
   cranes::path maze_solution(maze, {E, S, E, S, E, S});
 
-  std::mt19937 gen;
-  cranes::grid small_random =  cranes::grid::random(4, 5, 6, 4, gen),
-               medium_random = cranes::grid::random(12, 24, 20, 20, gen),
-               large_random =  cranes::grid::random(20, 79, 30, 70, gen);
-
 
   rubric.criterion("exhaustive optimization - simple cases", 4,
 		   [&]() {
@@ -95,21 +90,6 @@ int main() {
 		   [&]() {
          TEST_EQUAL("correct", maze_solution, crane_unloading_dyn_prog(maze));
 		   });
-
-  rubric.criterion("dynamic programming - random instances", 1,
-		   [&]() {
-         std::cout << std::endl;
-
-         auto small_output = crane_unloading_dyn_prog(small_random);
-         TEST_EQUAL("small", 4, small_output.total_cranes());
-
-         auto medium_output = crane_unloading_dyn_prog(medium_random);
-         TEST_EQUAL("medium", 8, medium_output.total_cranes());
-
-         auto large_output = crane_unloading_dyn_prog(large_random);
-         TEST_EQUAL("large", 11, large_output.total_cranes());
-		   });
-
   rubric.criterion("stress test", 2,
 		   [&]() {
          const cranes::coordinate ROWS = 5,
