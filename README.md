@@ -6,6 +6,13 @@
 Team Members:
  
 Ranny Khant Naing / Email: khant_naing@csu.fullerton.edu
+ 
+Santiago Zavala / Email: arturo.santi015@csu.fullerton.edu
+
+Ibrahim Israr / Email: misrar0@csu.fullerton.edu
+
+Kyle Dang / Email: dangkyle@csu.fullerton.edu 
+
 
 **Clone This repository into your repository and implement the code, along with a document with required details mentioned at the last, a demo video, readme file and .gitignore file. Submission will be a git repo link with all the requirements updated to repo on canvas.**
 
