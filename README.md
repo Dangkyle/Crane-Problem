@@ -16,6 +16,16 @@ Kyle Dang / Email: dangkyle@csu.fullerton.edu
 
 **Clone This repository into your repository and implement the code, along with a document with required details mentioned at the last, a demo video, readme file and .gitignore file. Submission will be a git repo link with all the requirements updated to repo on canvas.**
 
+Team Members:
+ 
+Ranny Khant Naing / Email: khant_naing@csu.fullerton.edu
+ 
+Santiago Zavala / Email: arturo.santi015@csu.fullerton.edu
+
+Ibrahim Israr / Email: misrar0@csu.fullerton.edu
+
+Kyle Dang / Email: dangkyle@csu.fullerton.edu
+
 # Abstract
 
 In this project you will implement two algorithms that both solve the crane unloading problem. The first algorithm uses exhaustive optimization and takes exponential time. The second algorithm uses dynamic programming, and takes cubic time. Check back here regularly (and especially before your final submission), to make sure your submission complies with any changes or edits. You may check the top of the document, where the date of the last edit will be noted.
